@@ -1,0 +1,95 @@
+﻿@page "/"
+@inject NavigationManager NavigationManager
+@inject IHttpClientServiceImplementation HttpClientServiceImplementation
+@implements IAsyncDisposable
+
+<PageTitle>SignalR Chat</PageTitle>
+<h3>SignalR Chat</h3>
+
+@if(!IsConnected)
+{
+    <div class="input-group">
+        <input @bind="username" class="form-control" placeholder="What's your name?">
+        @* <button class="btn btn-primary form-control-append" @onclick="Connect">
+            Connect
+        </button> *@
+        <button class="btn btn-primary form-control-append" @onclick="Auth">
+            Authenticate
+        </button>
+    </div>
+}
+else
+{
+    <textarea style="width: 100%; height: 500px;" @ref="TextAreaRef">
+        @messages
+    </textarea>
+    <div class="input-group">
+        <input @bind-value="message"
+            @bind-value:event="oninput"
+            @onkeyup="HandleInput"
+            class="form-control">
+        <button class="btn btn-primary form-group-append"
+            @onclick="Send"
+            disables="@(!IsConnected)">
+            Send
+        </button>
+
+    </div>
+}
+
+@code {
+    private HubConnection? hubConnection;
+    private string messages = string.Empty;
+    private string username = string.Empty;
+    private string message = string.Empty;
+    ElementReference TextAreaRef;
+
+    private async Task Auth()
+    {
+
+    }
+
+    private async Task Connect()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/chat-hub"))
+            .Build();
+
+        hubConnection.On<string, string>("Receive Message", (user, message) => 
+        {
+            var msg = $"{(string.IsNullOrEmpty(user) ? "" : user + ": ")} {message}";
+            messages += msg + "\n";
+
+            StateHasChanged();
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    private async Task Send()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.SendAsync("AddMessageToChat", username, message);
+            message = string.Empty;
+        }
+    }
+
+    private async Task HandleInput(KeyboardEventArgs args)
+    {
+        if (args.Key.Equals("Enter"))
+        {
+            await Send();
+        }
+    }
+
+    public bool IsConnected => hubConnection?.State == HubConnectionState.Connected; 
+    
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+}
