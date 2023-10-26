@@ -1,4 +1,4 @@
-namespace Client.Services
+namespace ChatApp.Client.Services
 {
     public interface IHttpClientServiceImplementation
     {
