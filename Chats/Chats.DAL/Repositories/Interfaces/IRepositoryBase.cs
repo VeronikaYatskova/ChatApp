@@ -6,6 +6,8 @@ namespace Chats.DAL.Repositories.Interfaces
     {
         Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>>? expression = null);
         Task<T?> FindByConditionAsync(Expression<Func<T, bool>> expression);
+        Task<IEnumerable<M>> FindDistinctAsync<M>(
+            Expression<Func<T, M>> expression, Expression<Func<T, bool>>? filter = null);
         Task<T> CreateAsync(T entity);
         Task UpdateAsync(T entity);
         void Delete(T entity);

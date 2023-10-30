@@ -49,6 +49,26 @@ namespace Chats.BLL.Services.Implementation
             return messagesResponse;
         }
 
+        public async Task<IEnumerable<Guid>> GetUsersChatsAsync(Guid senderId)
+        {
+            var receivers = await _unitOfWork.ChatRepository
+                .FindDistinctAsync(c => c.ReceiverId, c => c.SenderId == senderId);
+
+            return receivers;
+        }
+
+        // relocate in a separate microservice
+        public async Task<UserInfoResponse> GetUserInfoAsync(Guid userId)
+        {
+            var user = await _unitOfWork.UserRepository
+                .FindByConditionAsync(u => u.Id == userId);
+
+            var userInfo = _mapper.Map<UserInfoResponse>(user);
+
+            return userInfo;
+        }
+        ///////////////////////////////////////
+
         public async Task RemoveMessageAsync(Guid messageId)
         {
             var message = await _unitOfWork.ChatRepository

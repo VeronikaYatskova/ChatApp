@@ -17,7 +17,7 @@ namespace Chats.Api.Controllers
         }
 
         [HttpGet("{receiverId}")]
-        public async Task<IEnumerable<ChatMessageResponse>> GetMessagesFromChat(Guid receiverId)
+        public async Task<IEnumerable<ChatMessageResponse>> GetMessagesFromChatAsync(Guid receiverId)
         {
             var currentSenderId = new Guid("c7825ca7-6844-4d33-a8d7-d2f049f99a83");
         
@@ -25,14 +25,28 @@ namespace Chats.Api.Controllers
                 .GetChatHistoryAsync(currentSenderId, receiverId);
         }
 
+        [HttpGet]
+        public async Task<IEnumerable<Guid>> GetUsersChatsAsync()
+        {
+            var currentSenderId = new Guid("c7825ca7-6844-4d33-a8d7-d2f049f99a83");
+
+            return await _chatService.GetUsersChatsAsync(currentSenderId);
+        }
+
+        [HttpGet("users/{userId}")]
+        public async Task<UserInfoResponse> GetUserInfoAsync(Guid userId)
+        {
+            return await _chatService.GetUserInfoAsync(userId);
+        }
+
         [HttpPost]
-        public async Task AddMessage(AddMessageRequest messageInfo)
+        public async Task AddMessageAsync(AddMessageRequest messageInfo)
         {
             await _chatService.AddMessageToChatAsync(messageInfo);
         }
 
         [HttpDelete("{receiverId}")]
-        public async Task ClearChatHistory(Guid receiverId)
+        public async Task ClearChatHistoryAsync(Guid receiverId)
         {
             var currentSenderId = new Guid("c7825ca7-6844-4d33-a8d7-d2f049f99a83");
 
@@ -40,7 +54,7 @@ namespace Chats.Api.Controllers
         }
 
         [HttpDelete("remove/{messageId}")] // <- no remove
-        public async Task DeleteMessageFromChat(Guid messageId)
+        public async Task DeleteMessageFromChatAsync(Guid messageId)
         {
             await _chatService.RemoveMessageAsync(messageId);
         }

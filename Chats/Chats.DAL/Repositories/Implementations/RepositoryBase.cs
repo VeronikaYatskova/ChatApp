@@ -26,6 +26,14 @@ namespace Chats.DAL.Repositories.Implementations
         public async Task<T?> FindByConditionAsync(Expression<Func<T, bool>> expression) =>
             await _dbSet.FirstOrDefaultAsync(expression);
         
+        public async Task<IEnumerable<M>> FindDistinctAsync<M>(
+            Expression<Func<T, M>> expression, Expression<Func<T, bool>>? filter = null)
+        {
+            return filter is null ?
+                await _dbSet.Select(expression).Distinct().ToListAsync() :
+                await _dbSet.Where(filter).Select(expression).Distinct().ToListAsync();
+        }
+
         public async Task<T> CreateAsync(T entity)
         {
             await _dbSet.AddAsync(entity);

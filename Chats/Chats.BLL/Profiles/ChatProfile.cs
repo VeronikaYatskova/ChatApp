@@ -11,6 +11,7 @@ namespace Chats.BLL.Profiles
         {
             CreateMap<Message, ChatMessageResponse>();
             CreateMap<AddMessageRequest, Message>();
+            CreateMap<User, UserInfoResponse>(); 
         }
     }
 }

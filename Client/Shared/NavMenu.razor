@@ -1,4 +1,8 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@inject IHttpClientServiceImplementation HttpClientServiceImplementation
+
+
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">ChatApp</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -9,16 +13,10 @@
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/chat/{chatId}">
-                <span class="oi oi-home" aria-hidden="true"></span> User Id
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/chat/{chatId}">
-                <span class="oi oi-plus" aria-hidden="true"></span> User Id
-            </NavLink>
-        </div>
+        @foreach (var user in await GetUserChat())
+        {
+            
+        }
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="/chat/{chatId}">
                 <span class="oi oi-list-rich" aria-hidden="true"></span> User Id
@@ -35,5 +33,10 @@
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    private async Task<IEnumerable<Guid>> GetUserChat()
+    {
+        return await HttpClientServiceImplementation.GetUsersChatExecute();
     }
 }
